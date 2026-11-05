@@ -1,32 +1,176 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#00ad58"><title>MD-11 GE Fan Balance</title><style>
-:root{color-scheme:dark;--bg:#0a1015;--panel:#14212a;--line:#2d454e;--green:#00b967;--text:#f2faf6;--muted:#9bb2b5;--warn:#ffd27a}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:15px system-ui,-apple-system,sans-serif}header{padding:22px 16px 17px;background:linear-gradient(145deg,#087d4b,#004b33);border-bottom:3px solid var(--green)}h1{margin:0;font-size:23px}header p{margin:5px 0 0;color:#d2ffdf}main{max-width:760px;margin:auto;padding:14px 14px 65px}.warning{border-left:4px solid #f3b749;background:#30291b;padding:12px;border-radius:8px;color:#ffe5ae;line-height:1.45;margin-bottom:14px}.tabs{display:flex;gap:7px;overflow-x:auto;padding-bottom:10px}.tab{flex:1;min-width:108px;border:1px solid var(--line);background:#172a2e;color:white;padding:12px;border-radius:10px;font-weight:750}.tab.active{background:var(--green);color:#051d13}section{display:none}section.active{display:block}.card{background:var(--panel);border:1px solid var(--line);padding:15px;border-radius:13px;margin:11px 0}.card h2{font-size:18px;margin:0 0 12px}.hint{color:var(--muted);line-height:1.5;font-size:13px}label{display:block;font-weight:650;font-size:13px;color:#d3e5e1;margin-bottom:5px}input,select{background:#071318;color:#fff;border:1px solid #507076;border-radius:9px;padding:12px;width:100%;font-size:16px}input:focus,select:focus{outline:2px solid var(--green)}.grid{display:grid;grid-template-columns:1fr 1fr;gap:11px}.metric{background:#092b22;border-radius:10px;padding:14px}.metric small{display:block;color:#a7caba}.metric strong{font-size:24px;color:#65f5a4}.pill{display:inline-block;padding:5px 9px;border-radius:30px;background:#315b49;color:#dcffea;font-size:12px}button{border:1px solid #4d7d6d;background:#0d5b3d;color:white;border-radius:9px;padding:11px 13px;font-size:14px;font-weight:700;cursor:pointer}.secondary{background:#23363c}button:disabled{opacity:.5}.holeGrid{display:grid;grid-template-columns:repeat(6,1fr);gap:6px}.hole{font-size:12px;padding:10px 1px;background:#142f2a}.hole.changed{background:#725528;border-color:#dda451}.hole.selected{outline:2px solid #98ffcb}.hole b{display:block}.hole small{display:block;color:#afdbd0}.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.row button{flex:1}.inventory{max-height:235px;overflow:auto}.entry{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--line)}.net{font-size:20px;font-weight:800;color:#75f5a5}.muted{color:var(--muted)}footer{font-size:12px;color:#9bb2b5;margin-top:20px;line-height:1.5}table{border-collapse:collapse;width:100%;font-size:13px}th,td{border:1px solid #436066;padding:9px 5px;text-align:center}th{background:#174735}details summary{cursor:pointer;font-weight:700}.result{border:1px solid #369769;background:#102f27;border-radius:12px;padding:15px;margin-top:12px}.badge{font-size:11px;background:#44391e;color:#fbe0a0;border-radius:8px;padding:4px 7px} @media(max-width:360px){.holeGrid{grid-template-columns:repeat(5,1fr)}.grid{grid-template-columns:1fr}}
-</style></head><body><header><h1>MD-11 / GE • FAN BALANCE</h1><p>38-hole spinner • Weight inventory & correction worksheet</p></header><main><div class="warning"><strong>ENGINEERING REVIEW REQUIRED — NOT APPROVED FOR MAINTENANCE.</strong> This prototype uses the supplied photographed figures. Weight inventory and vector arithmetic are implemented; the RPM/vibration table estimator is <strong>not</strong> an exact AMM lookup and cannot establish an approved correction. Verify configuration, effectivity, procedure, and all values in current controlled GE/MD-11 maintenance data before any installation.</div><nav class="tabs"><button class="tab active" data-tab="balance">Balance</button><button class="tab" data-tab="weights">38 Holes</button><button class="tab" data-tab="reference">Manual Data</button></nav>
-<section id="balance" class="active"><div class="card"><h2>1 • Measured vibration</h2><div class="grid"><div><label for="n1">N1 speed (%)</label><select id="n1"></select></div><div><label for="vib">Indicated vibration (mils)</label><input id="vib" type="number" min="2" max="10" step="0.2" value="4.0"></div><div><label for="phase">Indicated phase (degrees)</label><input id="phase" type="number" min="0" max="360" step="0.1" value="90"></div><div><label for="targetHole">Reference hole (manual-confirmed)</label><input id="targetHole" type="number" min="1" max="38" step="1" placeholder="1–38"></div></div><p class="hint">Hole location tables are in Figures 525 (88–97%) and 526 (98–106%). Select the location from the controlled manual and enter it here. The app does not infer a hole from an unvalidated transcription.</p><div class="result" id="estimate"></div></div>
-<div class="card"><h2>2 • Change a screw at the selected hole</h2><div class="grid"><div><label for="newPart">Replacement screw</label><select id="newPart"></select></div><div><label for="selectedHole">Hole to change</label><input id="selectedHole" type="number" min="1" max="38" value="1"></div></div><div class="result" id="deltaPreview"></div><button id="apply">Record screw replacement</button><p class="hint">Records the installed screw and computes its effective weight difference against the currently installed screw. No installation action is authorized by this worksheet.</p></div><div class="card"><h2>3 • Current net change from standard P07/P14 set</h2><div class="grid"><div class="metric"><small>Net equivalent vector magnitude</small><strong id="netGram">0.00 g</strong></div><div class="metric"><small>Net vector angle (hole 1 = 0°)</small><strong id="netAngle">—</strong></div></div><p class="hint">Vector sum of all deviations from standard P07/P14 at 38 equally spaced positions (360°/38). A negative change is modeled 180° opposite its position. This is an inventory-equivalent calculation only, not a predicted measured vibration or an approved trim balance.</p><div id="impact" class="result"></div></div></section>
-<section id="weights"><div class="card"><h2>Spinner cone • 38 screw positions</h2><p class="hint">Default: all 38 positions P07/P14. Tap any hole to modify it. Alterations are stored locally on this device.</p><div class="row"><button id="reset" class="secondary">Reset all to P07/P14</button><button id="copy" class="secondary">Copy inventory</button></div><div class="holeGrid" id="holeGrid" style="margin-top:13px"></div></div><div class="card"><h2>Current nonstandard installations</h2><div id="changes" class="inventory"></div></div><div class="card"><h2>Backup / restore configuration</h2><p class="hint">Export the installed-screw configuration as JSON; paste JSON below to restore. Data does not synchronize between devices.</p><div class="row"><button id="export">Copy JSON</button><button id="import">Import pasted JSON</button></div><textarea id="json" rows="3" style="width:100%;margin-top:10px;background:#071318;border:1px solid #507076;color:white;border-radius:9px;padding:10px" placeholder="Configuration JSON"></textarea></div></section>
-<section id="reference"><div class="card"><h2>Figure 527 • Spinner cone balance screws</h2><table><thead><tr><th>Marking</th><th>Pan wt. (g)</th><th>Eff. wt. (g)</th></tr></thead><tbody id="screwTable"></tbody></table><p class="hint">Same-weight paired part-number markings are interchangeable per photo. Table values visually transcribed from Figure 527; verify against controlled source.</p></div><div class="card"><h2>Figure 511 • Effective-weight difference</h2><p class="hint">For substitutions, the app uses this difference table (not subtraction of rounded Figure 527 effective weights). Positive = increasing effective weight, negative = decreasing it. The unusual P06/P13 difference, 17.31 g, is from Figure 511.</p><div style="overflow:auto"><table id="differenceTable"></table></div></div><div class="card"><h2>Source figure index</h2><div class="entry">Figure 511 <span>Effective weight differences</span></div><div class="entry">Figure 523 <span>88–97% correction grams</span></div><div class="entry">Figure 525 <span>88–97% placement holes</span></div><div class="entry">Figure 526 <span>98–106% placement holes</span></div><div class="entry">Figure 527 <span>Screw parts and weights</span></div><div class="entry">DB2-72-0927C <span>98–107% correction grams</span></div><p class="hint">The photos cover 88–107% for correction weights, but only 88–106% for hole placement. Percent ranges outside those tables are not supported.</p></div></section>
-<footer>MD-11 GE fan-plane only • Worksheet build 1.0 • Offline-compatible single HTML file • No external dependencies • This tool is not an approved or controlled maintenance document.</footer></main><script>
-'use strict';
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#067341"><title>MD-11 GE | Fan Balance Lightweight</title>
+<style>
+:root{font-family:system-ui,-apple-system,sans-serif;color-scheme:dark;color:#e9f9f1;background:#071510;--green:#06c977}*{box-sizing:border-box}body{margin:0;background:#071510}header{background:linear-gradient(130deg,#08784d,#07372a);padding:22px 16px;border-bottom:2px solid var(--green)}h1{font-size:23px;margin:0}header p{margin:5px 0 0;color:#bde8d1;font-size:13px}main{max-width:800px;margin:auto;padding:14px 13px 65px}.tabs{display:flex;gap:7px;position:sticky;top:0;background:#071510;padding:9px 0;z-index:3}.tabs button{flex:1;background:#152821;color:#eafbf1;border:1px solid #285a48;border-radius:12px;padding:12px 4px;font-size:14px;font-weight:750}.tabs button.on{background:#04b86a;color:#052719}.card{border:1px solid #285444;border-radius:15px;background:#10251e;margin:13px 0;padding:17px}section{display:none}section.on{display:block}.amt-note{margin:5px 0 14px;font-size:13px;font-weight:800;letter-spacing:.02em;color:#d8f6e8}.warn{background:#332817;border-left:4px solid #ffcf78;color:#ffe6b7;padding:12px;border-radius:8px;font-size:13px;line-height:1.5}.grid{display:grid;grid-template-columns:1fr 1fr;gap:11px}label{display:block;font-size:13px;font-weight:750;margin-bottom:6px}input,select{width:100%;padding:14px 12px;border-radius:11px;border:1px solid #568371;background:#071812;color:white;font-size:17px}input:focus,select:focus{outline:2px solid #05c977}.full{grid-column:1/-1}.btn{padding:14px 13px;border:1px solid #388667;border-radius:10px;background:#195b41;color:white;font-weight:780;font-size:15px;cursor:pointer}.primary{display:block;width:100%;margin-top:16px;background:#04bf70;color:#05291c;font-size:20px;border:0;padding:18px}.muted{color:#9fc0b4;font-size:13px;line-height:1.55}.result{padding:16px;border:1px solid #348961;background:#092d21;border-radius:12px;margin-top:14px;line-height:1.5}.big{font-size:32px;font-weight:850;color:#69ffae}.badge{display:inline-block;color:#ffe0a7;background:#5a4221;border-radius:7px;font-size:11px;padding:4px 8px;font-weight:700}.list{display:grid;gap:8px}.change{display:grid;grid-template-columns:60px 1fr 1fr;gap:7px;padding:11px;background:#173b2c;border-radius:8px;align-items:center}h2{font-size:18px;margin:4px 0 12px}h3{font-size:15px;margin:15px 0 8px}.holes{display:grid;grid-template-columns:repeat(6,1fr);gap:7px}.holes button{padding:10px 2px;border-radius:9px;background:#194332;border:1px solid #397b59;color:white;font-weight:750;font-size:13px}.holes button.changed{background:#675029}.holes span{display:block;font-size:10px;font-weight:500}.tablewrap{overflow-x:auto}table{width:100%;border-collapse:collapse;font-size:13px}td,th{border:1px solid #4b7563;padding:8px 5px;text-align:center}th{background:#1d503c}.doc{display:block;max-width:100%;height:auto;border:1px solid #416454;margin:12px auto}.small{font-size:12px}.actions{display:flex;gap:8px}.actions button{flex:1}footer{color:#8caf9e;font-size:12px;line-height:1.6}.confirmbox{border:1px solid #418469;border-radius:12px;background:#0c3225;padding:15px;margin-top:16px}.confirmrow{display:flex;align-items:flex-start;gap:12px;font-size:15px;line-height:1.5;cursor:pointer}.confirmrow input{width:23px;height:23px;flex:0 0 23px;margin:2px 0;accent-color:#07cd80}.confirmbox .btn{margin-top:12px;width:100%}.confirmbox .muted{margin:8px 0 0}.btn:disabled{background:#3b6454;color:#c0d5cb;opacity:.55;cursor:not-allowed}details summary{cursor:pointer;padding:8px 0;font-weight:750}@media(max-width:370px){.holes{grid-template-columns:repeat(5,1fr)}}
+</style></head><body><header><h1>MD-11 GE • EVM FAN BALANCE</h1><p>Pages 51–64 only · 38-hole spinner · reference and inventory worksheet</p></header><main>
+<p class="amt-note">AMT IS RESPONSIBLE FOR VERIFYING AMM DATA IS CURRENT.</p>
+<nav class="tabs"><button data-tab="balance" class="on">Calculate</button><button data-tab="inventory">38 Holes</button><button data-tab="manual">Source Pages</button></nav>
+<section id="balance" class="on"><div class="card"><h2>1 · EVM readings</h2><div class="grid"><div><label for="mils">Vibration · mils</label><input id="mils" type="number" min="2" max="10" step="any" inputmode="decimal" placeholder="4.54"></div><div><label for="phase">Phase · degrees</label><input id="phase" type="number" min="0" max="360" step="any" inputmode="decimal" placeholder="72"></div><div class="full"><label for="n1">N1 speed · % / RPM</label><select id="n1"></select></div></div><div class="confirmbox"><h3 style="margin:0 0 10px">Confirm installed fan screws</h3><label class="confirmrow" for="allStandard"><input type="checkbox" id="allStandard"><span><b>ALL 38 POSITIONS HAVE P07/P14 INSTALLED</b><span style="display:block;font-size:12px;color:#b5d7c7">Check only after verifying actual installed screws; a saved default is not verification.</span></span></label><button id="updateWeights" type="button" class="btn">UPDATE WEIGHTS / DIFFERENT SCREWS</button><div id="confirmStatus" class="muted" role="status" aria-live="polite">Choose the checkbox above, or update and confirm the 38-hole inventory before calculating.</div></div><button id="calc" type="button" class="btn primary" style="display:block;width:100%;min-height:58px;font-size:20px;font-weight:800;position:relative;z-index:2;margin-top:16px">CALCULATE</button><div id="result" class="result" role="status" aria-live="polite">Enter mils and phase, select the measured N1, then press Calculate.</div><div id="autoOut" class="result" role="status" aria-live="polite">Centered screw-weight comparisons will appear here automatically after CALCULATE.</div></div>
+<div class="card"><h2>2 · Use exact verified AMM correction instead</h2><p class="muted">CALCULATE now automatically shows sample weight distributions centered on the preliminary hole above. To compare against the exact AMM table instead of a rough estimate, enter verified grams and the verified center hole below.</p><div class="grid"><div><label for="verifiedWeight">Confirmed effective grams (W1)</label><input id="verifiedWeight" type="number" min="0" step="any" placeholder="Enter from AMM"></div><div><label for="verifiedHole">Confirmed reference hole</label><input id="verifiedHole" type="number" min="1" max="38" step="1" placeholder="1–38"></div></div><button class="btn primary" id="draft">SHOW SCREW / HOLE COMPARISON</button><div id="draftOut" class="result">Enter the two confirmed AMM values above. The comparison will list hole numbers, screws currently recorded and candidate screw classes.</div></div></section>
+<section id="inventory"><div class="card"><h2>Installed spinner screws</h2><p class="muted">All 38 positions start as P07/P14 in the sample inventory. This is a default, not confirmation of actual installed hardware. Select a hole, then set its currently installed screw. Confirm every actual installed screw before using comparisons. Saved on this device; reset and export are available.</p><div id="holes" class="holes"></div><div class="grid" style="margin-top:15px"><div><label for="holeInput">Selected hole</label><select id="holeInput"></select></div><div><label for="partInput">Installed P-number</label><select id="partInput"></select></div></div><div class="actions" style="margin-top:12px"><button class="btn" id="savePart">Save hole</button><button class="btn" id="reset">Reset 38</button></div><button class="btn primary" id="confirmInventory" type="button">CONFIRM INSTALLED WEIGHTS &amp; RETURN</button><button class="btn" id="export" style="margin-top:11px;width:100%">Copy inventory</button><p id="inventoryStatus" class="muted"></p></div></section>
+<section id="manual"><div class="card"><h2>AMM source figures · PDF pages 51–64</h2><p class="muted">Images removed to allow reliable GitHub mobile upload. Refer to the controlled AMM for these figures. Calculated values remain unverified worksheet estimates.</p><div><label for="fig">Source figure</label><select id="fig"><option value="60">Figure 523 · correction grams 88–97%</option><option value="61">Figure 524 · correction grams 98–107%</option><option value="62">Figure 525 · hole location 88–97%</option><option value="63">Figure 526 · hole location 98–106%</option><option value="64">Figure 527 · screw weights</option></select></div><div class="result" id="figureNote">Reference images removed from lightweight GitHub version. Consult controlled AMM Figures 523–527 for exact values.</div><p class="muted">Procedure context: PDF pp. 51–57. Source figures: pp. 60–64. Figure 528 and Figure 511 are outside the user-selected range and are not used here.</p></div></section>
+<footer>MD-11 GE fan balance worksheet · AMM source PDF pages 51–64</footer>
+</main><script>
+const $=id=>document.getElementById(id);
+const docImages={};
 const P=['P07/P14','P01/P08','P02/P09','P03/P10','P04/P11','P05/P12','P06/P13'];
 const eff=[6.44,9.66,12.53,15.60,18.44,21.15,23.75];
-const pan=[6.6,10,13.4,16.8,20,23.6,27];
-// Figure 511: rows and columns in P07,P01,P02,P03,P04,P05,P06 order.
-const dif=[[0,3.14,6.24,9.16,12,14.71,17.31],[3.14,0,3.10,6.02,8.86,11.57,14.17],[6.24,3.10,0,2.92,5.76,8.47,11.07],[9.16,6.02,2.92,0,2.84,5.55,8.15],[12,8.86,5.76,2.84,0,2.71,5.31],[14.71,11.57,8.47,5.55,2.71,0,2.60],[17.31,14.17,11.07,8.15,5.31,2.60,0]];
-const get=id=>document.getElementById(id),fmt=n=>Number(n).toFixed(2);
-let installed;try{const v=JSON.parse(localStorage.getItem('md11ge-weights-v1'));installed=Array.isArray(v)&&v.length===38&&v.every(x=>Number.isInteger(x)&&x>=0&&x<7)?v:Array(38).fill(0)}catch(e){installed=Array(38).fill(0)}
-const persist=()=>{try{localStorage.setItem('md11ge-weights-v1',JSON.stringify(installed))}catch(e){}};
-const difference=(from,to)=>Math.sign(to-from)*dif[from][to];
-const validHole=n=>Number.isInteger(n)&&n>=1&&n<=38;
-const net=()=>{let x=0,y=0;installed.forEach((part,i)=>{let w=difference(0,part),theta=2*Math.PI*i/38;x+=w*Math.cos(theta);y+=w*Math.sin(theta)});return {x,y,mag:Math.hypot(x,y),angle:(Math.atan2(y,x)*180/Math.PI+360)%360}};
-function refresh(){get('holeGrid').innerHTML=installed.map((p,i)=>`<button class="hole ${p?'changed':''} ${Number(get('selectedHole').value)===i+1?'selected':''}" data-hole="${i+1}"><b>${i+1}</b><small>${P[p].split('/')[0]}</small></button>`).join('');document.querySelectorAll('[data-hole]').forEach(el=>el.onclick=()=>{get('selectedHole').value=el.dataset.hole;get('newPart').value=installed[Number(el.dataset.hole)-1];switchTab('balance');refresh()});const n=net();get('netGram').textContent=fmt(n.mag)+' g';get('netAngle').textContent=n.mag<.005?'—':fmt(n.angle)+'°';get('impact').textContent=installed.every(p=>p===0)?'Standard inventory: 38 × P07/P14; net change = 0.':`Current inventory net vector: X = ${fmt(n.x)} g, Y = ${fmt(n.y)} g. This vector is referenced to hole 1 and is not an installation recommendation.`;get('changes').innerHTML=installed.map((p,i)=>p?`<div class="entry"><b>Hole ${i+1}</b><span>${P[p]} • +${fmt(difference(0,p))} g effective</span></div>`:'').filter(Boolean).join('')||'<p class="muted">No changes from default set.</p>';preview()}
-function preview(){const hole=Number(get('selectedHole').value),to=Number(get('newPart').value);if(!validHole(hole)){get('deltaPreview').textContent='Enter hole 1 through 38.';return}let from=installed[hole-1];let d=difference(from,to);get('deltaPreview').textContent=`Hole ${hole}: ${P[from]} → ${P[to]}. Effective weight change: ${d>=0?'+':''}${fmt(d)} g. ${d<0?'Reduction in mass at this position.':''}`}
-// Correction-weight table endpoints shown in supplied photos. Interior values vary by vibration row and must be checked in manual.
 const rpm=[2886,2919,2952,2985,3018,3050,3083,3116,3149,3182,3214,3247,3280,3313,3346,3378,3411,3444,3477,3510];
-const low2=[42.3,41.2,40.2,39.1,38,36.9,35.9,34.8,33.7,32.6];const low10=[211.6,206.2,200.8,195.4,190.1,184.7,179.3,173.9,168.5,163.1];
-const high2=[31.6,30.5,29.4,28.3,27.2,26.2,25.1,24.0,22.9,21.9];const high10=[157.8,152.4,147.0,141.6,136.2,130.9,125.5,120.1,114.7,109.3];
-function estimator(){let p=Number(get('n1').value),v=Number(get('vib').value),phase=Number(get('phase').value),i=p-88;if(!Number.isFinite(v)||v<2||v>10||!Number.isFinite(phase)||phase<0||phase>360){get('estimate').innerHTML='Enter vibration 2.0–10.0 mils and phase 0–360°.';return}const lo=i<10?low2[i]:high2[i-10],hi=i<10?low10[i]:high10[i-10];const est=lo+(hi-lo)*(v-2)/8;get('estimate').innerHTML=`<span class="badge">UNVALIDATED ESTIMATE — NOT AMM LOOKUP</span><div style="font-size:27px;font-weight:800;margin:10px 0">≈ ${est.toFixed(1)} g</div><div class="hint">Figure ${p<=97?'523':'DB2-72-0927C'} photographed correction-weight table, ${p}% N1 (${rpm[i].toLocaleString()} RPM). This uses <strong>linear interpolation between the photographed 2.0 and 10.0 mil endpoint rows</strong>, not a transcription of intermediate rows. Do not use the estimate for maintenance.</div>`}
-function switchTab(tab){document.querySelectorAll('section').forEach(s=>s.classList.toggle('active',s.id===tab));document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active',t.dataset.tab===tab))}
-document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>switchTab(t.dataset.tab));
-get('n1').innerHTML=rpm.map((r,i)=>`<option value="${88+i}" ${i===12?'selected':''}>${88+i}% • ${r.toLocaleString()} RPM</option>`).join('');get('newPart').innerHTML=P.map((p,i)=>`<option value="${i}">${p} • ${eff[i].toFixed(2)}g eff.</option>`).join('');get('screwTable').innerHTML=P.map((p,i)=>`<tr><td>${p}</td><td>${pan[i].toFixed(1)}</td><td>${eff[i].toFixed(2)}</td></tr>`).join('');get('differenceTable').innerHTML=`<tr><th>From / To</th>${P.map(p=>`<th>${p.split('/')[0]}</th>`).join('')}</tr>`+P.map((p,i)=>`<tr><th>${p.split('/')[0]}</th>${dif[i].map(n=>`<td>${fmt(n)}</td>`).join('')}</tr>`).join('');
-get('selectedHole').oninput=refresh;get('newPart').onchange=preview;get('apply').onclick=()=>{let hole=Number(get('selectedHole').value),to=Number(get('newPart').value);if(!validHole(hole)||!Number.isInteger(to)||to<0||to>6){alert('Check hole and part.');return}installed[hole-1]=to;persist();refresh()};get('reset').onclick=()=>{if(confirm('Reset all 38 screw positions to P07/P14?')){installed=Array(38).fill(0);persist();refresh()}};get('copy').onclick=()=>navigator.clipboard.writeText(installed.map((p,i)=>`Hole ${String(i+1).padStart(2,'0')}: ${P[p]}`).join('\n')).then(()=>alert('Inventory copied'),()=>alert('Copy not available in this browser.'));get('export').onclick=()=>{const data=JSON.stringify({type:'md11-ge-fan-38',version:1,installed});get('json').value=data;navigator.clipboard?.writeText(data).catch(()=>{})};get('import').onclick=()=>{try{const d=JSON.parse(get('json').value);if(d.type!=='md11-ge-fan-38'||!Array.isArray(d.installed)||d.installed.length!==38||!d.installed.every(x=>Number.isInteger(x)&&x>=0&&x<=6))throw Error('Invalid configuration');if(confirm('Replace all 38 positions with imported data?')){installed=d.installed.slice();persist();refresh()}}catch(e){alert('Invalid configuration JSON.')}};['n1','vib','phase'].forEach(id=>get(id).addEventListener('input',estimator));get('targetHole').addEventListener('change',()=>{const n=Number(get('targetHole').value);if(validHole(n)){get('selectedHole').value=n;get('newPart').value=installed[n-1];refresh()}});refresh();estimator();
-</script></body></html>
+const weight100=[29.4,32.3,35.3,38.2,41.2,44.1,47.0,50.0,52.9,55.9,58.8,61.7,64.7,67.6,70.6,73.5,76.4,79.4,82.3,85.3,88.2,91.1,94.1,97.0,100.0,102.9,105.8,108.8,111.7,114.7,117.6,120.5,123.5,126.4,129.4,132.3,135.2,138.2,141.1,144.1,147.0];
+const phaseRanges=[[5.1,14],[14.1,24],[24.1,33],[33.1,43],[43.1,52],[52.1,62],[62.1,71],[71.1,81],[81.1,90],[90.1,99],[99.1,109],[109.1,118],[118.1,128],[128.1,137],[137.1,147],[147.1,156],[156.1,166],[166.1,175],[175.1,185],[185.1,194],[194.1,204],[204.1,213],[213.1,223],[223.1,232],[232.1,242],[242.1,251],[251.1,261],[261.1,270],[270.1,279],[279.1,289],[289.1,298],[298.1,308],[308.1,317],[317.1,327],[327.1,336],[336.1,346],[346.1,355],[355.1,365]];
+const firstHole={90:26,91:26,92:27,93:27,94:27,95:28,96:28,97:28,98:29,99:29,100:30,101:30};
+const endpoints={
+90:[40.2,200.8],91:[39.1,195.4],92:[38.0,190.1],93:[36.9,184.7],
+94:[35.9,179.3],95:[34.8,173.9],96:[33.7,168.5],97:[32.6,163.1],
+98:[31.6,157.8],99:[30.5,152.4],100:[29.4,147.0],101:[28.3,141.6]
+};
+const holeAt=(speed,bin)=>{let v=firstHole[speed];return v==null||bin<0?null:((v+bin-1)%38)+1};
+let installed;try{let r=JSON.parse(localStorage.getItem('md11ge-pp51-64-v2'));installed=Array.isArray(r)&&r.length===38&&r.every(x=>Number.isInteger(x)&&x>=0&&x<=6)?r:Array(38).fill(0)}catch(e){installed=Array(38).fill(0)}
+let last=null;
+let screwConfirmation=null; // Explicitly checked in this session, never inferred from stored inventory.
+
+const save=()=>{try{localStorage.setItem('md11ge-pp51-64-v2',JSON.stringify(installed))}catch(e){}};
+const names=n=>P[n];const fmt=v=>Number(v).toFixed(2);
+function isAllStandard(){return installed.every(i=>i===0)}
+function showTab(name){document.querySelectorAll('[data-tab]').forEach(n=>n.classList.toggle('on',n.dataset.tab===name));document.querySelectorAll('section').forEach(n=>n.classList.toggle('on',n.id===name));}
+function refreshConfirmation(){
+ const standard=isAllStandard();
+ $('allStandard').checked=screwConfirmation==='standard'&&standard;
+ $('allStandard').disabled=!standard;
+ $('allStandard').parentElement.style.opacity=standard?'1':'.55';
+ const verified=screwConfirmation==='standard'&&standard||screwConfirmation==='inventory';
+ $('calc').disabled=!verified; $('draft').disabled=!verified;
+ $('confirmStatus').textContent=verified?(screwConfirmation==='standard'?'Confirmed: all 38 installed screws are P07/P14.':'Confirmed: using the verified 38-hole inventory.'):(standard?'Verification required before calculation.':'The recorded screws differ from P07/P14. Choose UPDATE WEIGHTS, verify every hole and press CONFIRM INSTALLED WEIGHTS.');
+}
+function invalidateConfirmation(){screwConfirmation=null;last=null;$('result').textContent='Installed screw inventory changed. Confirm the configuration again before calculating.';$('draftOut').textContent='Confirm installed screw inventory again before comparing.';$('autoOut').textContent='Confirm screw inventory, then press CALCULATE to see centered comparisons.';refreshConfirmation();}
+function renderHoles(){ $('holes').innerHTML=installed.map((p,i)=>`<button type="button" class="${p?'changed':''}" data-hole="${i+1}">${i+1}<span>${P[p].split('/')[0]}</span></button>`).join('');document.querySelectorAll('[data-hole]').forEach(b=>b.onclick=()=>{$('holeInput').value=b.dataset.hole;$('partInput').value=installed[Number(b.dataset.hole)-1]});$('inventoryStatus').textContent=installed.filter(p=>p!==0).length+' hole(s) differ from P07/P14.';}
+function calculate(){if(!screwConfirmation){$('result').textContent='Confirm the installed screw configuration first: check ALL P07/P14 or use UPDATE WEIGHTS.';return;}const v=Number($('mils').value),ph=Number($('phase').value),speed=Number($('n1').value);if(!$('mils').value||!$('phase').value||!Number.isFinite(v)||v<2||v>10||!Number.isFinite(ph)||ph<0||ph>360){$('result').innerHTML='Enter vibration from 2.0–10.0 mils and phase from 0–360°. Values outside the photographed chart cannot be calculated.';last=null;$('autoOut').textContent='No valid estimate is available for a centered comparison.';return}
+ // The last table row is 355.1–365 degrees: 0–5 degrees wrap into this same row.
+ const lookupPhase=ph<=5?ph+360:ph;
+ const bin=phaseRanges.findIndex(([a,b])=>lookupPhase>=a-1e-6&&lookupPhase<=b+1e-6);const hole=holeAt(speed,bin);let grams;if(speed===100){let r=(v-2)/.2,l=Math.max(0,Math.min(40,Math.floor(r))),h=Math.min(40,Math.max(0,Math.ceil(r)));grams=weight100[l]+(weight100[h]-weight100[l])*(r-l); }else{let t=endpoints[speed];grams=t[0]+(t[1]-t[0])*(v-2)/8}
+ last={grams,hole,speed,v,ph};$('result').innerHTML=`<span class="badge">REFERENCE ONLY · VALIDATE AGAINST AMM</span><h2 style="margin-top:12px">${speed}% N1 · ${rpm[speed-88].toLocaleString()} RPM</h2><div class="big">≈ ${grams.toFixed(1)} g</div><p>Corrective effective-weight magnitude ${speed===100?'from the manually transcribed 100% column':'estimated using chart endpoints; not the exact intermediate manual cell'}.</p><h3>${hole===null?'Phase bin not mapped':`Preliminary location: hole ${hole}`}</h3><p>Entered ${v.toFixed(2)} mils, ${ph.toFixed(1)}°. ${hole===null?'Check the displayed phase scale and Fig. 525/526.':`Installed reference screw at that hole: <b>${P[installed[hole-1]]}</b>. Hole progression must be checked against Figure ${speed<=97?'525':'526'} at this N1.`}</p><p class="muted"><b>For exact AMM-based verification:</b> confirm the exact effective grams and hole from the current controlled AMM, then use Step 2 below.</p>`;
+ $('verifiedWeight').value='';$('verifiedHole').value='';$('draftOut').textContent='Enter exact confirmed AMM values here to compare with the automatic example above.';draft('auto');}
+// Enumerate a small set of centered neighboring-hole changes, for comparison only.
+// Compare vector magnitudes from Fig 527 effective weights. Not a rotor dynamic model.
+function draft(mode='manual'){
+ const automatic=mode==='auto';
+ const output=$(automatic?'autoOut':'draftOut');
+ if(!screwConfirmation){output.textContent='Confirm installed screws before comparing replacements.';return;}
+ const weightField=$('verifiedWeight'),holeField=$('verifiedHole');
+ const w=automatic?(last?.grams):Number(weightField.value);
+ const h=automatic?(last?.hole):Number(holeField.value);
+ if((!automatic&&(!weightField.value||!holeField.value))||!Number.isFinite(w)||w<=0||!Number.isInteger(h)||h<1||h>38){
+   output.textContent=automatic?'No reliable hole/weight estimate for this speed. Verify exact hole and grams from the AMM.':'Enter confirmed effective grams and reference hole from the current AMM first.';return;
+ }
+ // Geometric vector search only. This does NOT implement AMM installability or rotor response.
+ const step=2*Math.PI/38, angle=i=>(i-1)*step;
+ const tx=w*Math.cos(angle(h)),ty=w*Math.sin(angle(h));
+ const circularDistance=(hole)=>Math.min((hole-h+38)%38,(h-hole+38)%38);
+ const ordered=Array.from({length:38},(_,i)=>i+1).sort((a,b)=>circularDistance(a)-circularDistance(b)||a-b);
+ const WIDTH=420;
+ const optionsFor=(hole)=>{
+   const old=installed[hole-1];
+   const opts=[null]; // Retain installed screw; no mandatory substitution.
+   for(let replacement=0;replacement<P.length;replacement++){
+     if(replacement===old)continue;
+     const delta=eff[replacement]-eff[old];
+     opts.push({hole,old,replacement,delta,x:delta*Math.cos(angle(hole)),y:delta*Math.sin(angle(hole))});
+   }
+   return opts;
+ };
+ const beamSearch=(radius)=>{
+   const holes=ordered.filter(hole=>circularDistance(hole)<=radius);
+   let states=[{x:0,y:0,items:[],distanceCost:0}];
+   const rank=(s,targetFraction)=>Math.hypot(s.x-tx*targetFraction,s.y-ty*targetFraction)+s.items.length*0.10+s.distanceCost*0.025;
+   for(let i=0;i<holes.length;i++){
+     const hole=holes[i],opts=optionsFor(hole);
+     const expanded=[];
+     for(const st of states)for(const op of opts){
+       if(!op){expanded.push(st);continue;}
+       expanded.push({x:st.x+op.x,y:st.y+op.y,items:[...st.items,op],distanceCost:st.distanceCost+circularDistance(hole)});
+     }
+     // Two beams: preserve direct-to-target states and balanced partial-build states.
+     // This avoids pruning necessary multi-screw corrections prematurely.
+     const progress=Math.min(1,(i+1)/Math.min(7,holes.length));
+     const select=(fraction,quota)=>{
+       const ranked=expanded.map(st=>({st,rank:rank(st,fraction)})).sort((a,b)=>a.rank-b.rank);
+       const picked=[],seen=new Set();
+       for(const {st} of ranked){
+         const key=Math.round(st.x*8)+'|'+Math.round(st.y*8)+'|'+st.items.length;
+         if(seen.has(key))continue;
+         seen.add(key);picked.push(st);
+         if(picked.length>=quota)break;
+       }
+       return picked;
+     };
+     const merged=[...select(1,Math.ceil(WIDTH/2)),...select(progress,Math.ceil(WIDTH/2))];
+     states=[];const seen=new Set();
+     for(const st of merged){const key=Math.round(st.x*8)+'|'+Math.round(st.y*8)+'|'+st.items.length;if(seen.has(key))continue;seen.add(key);states.push(st)}
+   }
+   return states.filter(s=>s.items.length>0).map(s=>({...s,residual:Math.hypot(s.x-tx,s.y-ty)}))
+      .sort((a,b)=>a.residual-b.residual||a.items.length-b.items.length||a.distanceCost-b.distanceCost);
+ };
+ // Expand the neighborhood when a closer vector is needed. Up to all 38 holes are eligible.
+ const tolerance=Math.max(0.5,w*0.015);
+ let best=[],searchRadius=3;
+ for(const radius of [3,5,8,12,19]){
+   const found=beamSearch(radius);
+   if(found.length){best=found;searchRadius=radius;}
+   if(best.length&&best[0].residual<=tolerance)break;
+ }
+ const esc=t=>String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;');
+ // Show distinct combinations, not near-duplicate ordering of the same change set.
+ const unique=[];const seen=new Set();
+ for(const r of best){
+   const signature=r.items.map(m=>m.hole+':'+m.replacement).sort().join('|');
+   if(seen.has(signature))continue;seen.add(signature);unique.push(r);
+   if(unique.length>=3)break;
+ }
+ const entries=unique.map((r,i)=>`<div style="margin-top:15px;padding-top:12px;border-top:1px solid #397359"><h3>Vector comparison ${i+1} · residual ${fmt(r.residual)} g · ${r.items.length} screw change(s)</h3><div class="list">${r.items.slice().sort((a,b)=>a.hole-b.hole).map(m=>`<div class="change"><b>Hole ${m.hole}</b><span>${esc(P[m.old])} → ${esc(P[m.replacement])}</span><b>${m.delta>0?'+':''}${fmt(m.delta)} g</b></div>`).join('')}</div><p class="muted">Calculated example vector ${fmt(Math.hypot(r.x,r.y))} g · vector residual ${fmt(r.residual)} g (${fmt(r.residual/w*100)}% of target). Signed weight differences are relative to the confirmed installed inventory.</p></div>`).join('');
+ const nearEnough=unique.length>0&&unique[0].residual<=tolerance;
+ const searchHoles=ordered.filter(n=>circularDistance(n)<=searchRadius).sort((a,b)=>a-b);
+ output.innerHTML=`<h2 style="margin-top:12px">${automatic?'Centered screw-vector comparisons around hole '+h:'Verified-target geometric comparisons'}</h2><p>Mathematical target: <b>${fmt(w)} effective g</b> at ${automatic?'preliminary':'entered'} center hole <b>${h}</b>. Search considered <b>${searchHoles.length} of 38 holes</b>, extending outward from the center as necessary. <b>No fixed three-screw limit.</b> Uses confirmed installed inventory.</p><p style="border:1px solid #54b991;border-radius:10px;padding:12px 14px;font-size:16px;font-weight:800;background:#104233">VERIFICATION RUN NECESSARY — Record vibration and phase after the correction and re-evaluate using the current AMM.</p><p class="muted"><b>${nearEnough?'Numerical match found within an illustrative '+fmt(tolerance)+' g search tolerance.':'No close numerical match found within the illustrative '+fmt(tolerance)+' g tolerance.'}</b></p>${entries||'<p>No candidate screw-change comparison found.</p>'}<p class="muted">Before installing screws, check aircraft effectivity, exact target values, screw types and placement against the current controlled AMM. The worksheet compares screw vectors. It does not check AMM placement restrictions or predict measured vibration.</p>`;
+}
+
+for(let s=88;s<=107;s++){$('n1').add(new Option(`${s}% · ${rpm[s-88].toLocaleString()} RPM`,s));} $('n1').value='100';
+for(let i=1;i<=38;i++)$('holeInput').add(new Option('Hole '+i,i));P.forEach((p,i)=>$('partInput').add(new Option(p+' · '+fmt(eff[i])+'g eff.',i)));
+$('savePart').onclick=()=>{let h=+$('holeInput').value;installed[h-1]=+$('partInput').value;save();renderHoles();invalidateConfirmation()};$('reset').onclick=()=>{if(confirm('Reset all 38 holes to P07/P14?')){installed=Array(38).fill(0);save();renderHoles();invalidateConfirmation()}};
+$('export').onclick=()=>{let t=installed.map((p,i)=>`Hole ${i+1}: ${P[p]}`).join('\n');if(navigator.clipboard)navigator.clipboard.writeText(t).then(()=>{$('inventoryStatus').textContent='Inventory copied.'}).catch(()=>{$('inventoryStatus').textContent=t});else $('inventoryStatus').textContent=t};
+$('allStandard').onchange=()=>{if($('allStandard').checked&&isAllStandard()){screwConfirmation='standard'}else{screwConfirmation=null}refreshConfirmation()};
+$('updateWeights').onclick=()=>{screwConfirmation=null;refreshConfirmation();showTab('inventory');$('inventoryStatus').textContent='Review and update actual installed screws, then select CONFIRM INSTALLED WEIGHTS & RETURN.';};
+$('confirmInventory').onclick=()=>{screwConfirmation='inventory';refreshConfirmation();showTab('balance');$('result').textContent='38-hole inventory confirmed for this session. Enter vibration, phase and N1, then press CALCULATE.';};
+$('calc').onclick=calculate;$('draft').onclick=()=>draft('manual');$('fig').onchange=()=>{$('figureNote').textContent='Selected figure: '+$('fig').selectedOptions[0].text+'. Consult controlled AMM for exact data.'};
+document.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>showTab(b.dataset.tab));
+renderHoles();refreshConfirmation();
+</script>
+<script>
+(() => {
+ const endpoint = 'https://aircraft-reference-usage.wgy9sy6b59.workers.dev/event';
+ const visitorKey = 'acmx-reference-visitor-v1';
+
+ function track(event, aircraft, visitor) {
+  try {
+   fetch(endpoint, {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({event, aircraft, visitor, eventId: crypto.randomUUID()}),
+    keepalive: true,
+    mode: 'cors'
+   }).catch(() => {});
+  } catch {}
+ }
+
+ try {
+  let visitor = crypto.randomUUID();
+  try {
+   const saved = localStorage.getItem(visitorKey);
+   if (saved && saved.length >= 10 && saved.length <= 100) {
+    visitor = saved;
+   } else {
+    localStorage.setItem(visitorKey, visitor);
+   }
+  } catch {}
+  track('vibe', 'md11', visitor);
+ } catch {}
+})();
+</script>
+</body></html>
