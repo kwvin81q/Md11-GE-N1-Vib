@@ -50,6 +50,29 @@ main, .wrap { text-shadow:0 1px 3px #09121b; }
 }
 
 </style>
+<style id="readable-vibe-text">
+.card {
+  background: #101924;
+  color: #f4f7fb;
+  padding: clamp(14px, 3vw, 24px);
+  border: 1px solid #526579;
+  border-radius: 16px;
+}
+main, .wrap { line-height: 1.55; }
+:is(main, .wrap) :is(p, .hint, .help, .muted, .lead, .notice, .amt-note, .fine, .tiny, summary, small, label) {
+  font-size: max(1rem, 16px);
+  line-height: 1.55;
+}
+:is(main, .wrap) :is(.hint, .help, .muted, .lead, .fine, .tiny) {
+  color: #dae4ee;
+}
+:is(header, .top, details, footer, p, .hint, .help, .fine, .tiny) {
+  text-shadow: 0 1px 3px #060a10;
+}
+body::before {
+  background-image: linear-gradient(rgba(5,11,19,.65), rgba(5,11,19,.48) 38%, #09121b 95%), url("./aircraft-wallpaper.webp");
+}
+</style>
 </head><body><header><h1>MD-11 GE • EVM FAN BALANCE</h1><p>Pages 51–64 only · 38-hole spinner · reference and inventory worksheet</p></header><main>
 <p class="amt-note">AMT IS RESPONSIBLE FOR VERIFYING AMM DATA IS CURRENT.</p>
 <nav class="tabs"><button data-tab="balance" class="on">Calculate</button><button data-tab="inventory">38 Holes</button><button data-tab="manual">Source Pages</button></nav>
