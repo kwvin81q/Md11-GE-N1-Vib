@@ -6,6 +6,50 @@
 <link rel="icon" type="image/png" sizes="192x192" href="./md11-ge-vibe-icon-r2-192.png">
 <link rel="manifest" href="./manifest.webmanifest?icons=r2">
 <meta name="apple-mobile-web-app-title" content="MD-11 GE">
+
+<style id="aircraft-wallpaper">
+body { isolation:isolate; min-height:100vh; background:#09121b; }
+body::before {
+  content:""; position:fixed; inset:0; z-index:-1; pointer-events:none;
+  background:linear-gradient(180deg,rgba(5,11,19,.45),rgba(5,11,19,.27) 35%,#09121b 95%),
+    url("./md11-ge-vibe-icon-r2-512.png") center top / clamp(410px, 100vw, 920px) auto no-repeat;
+}
+
+.card {
+  background:transparent;
+  border:0;
+  border-top:1px solid #526275;
+  border-radius:0;
+  padding-inline:0;
+}
+main, .wrap { text-shadow:0 1px 3px #09121b; }
+
+
+:is(div, label):has(> :is(input:not([type=checkbox]):not([type=radio]), select)):not(:has(> :is(input:not([type=checkbox]):not([type=radio]), select) ~ :is(input:not([type=checkbox]):not([type=radio]), select))) {
+  display:block;
+  min-width:0;
+  padding:9px 12px;
+  border:1px solid #42566a;
+  border-radius:12px;
+  background:rgba(13,21,29,.93);
+}
+:is(input:not([type=checkbox]):not([type=radio]), select) {
+  box-sizing:border-box;
+  min-height:44px;
+  width:100%;
+  color:#f4f8fc;
+  font-size:max(16px, 1rem);
+  border:0;
+  border-bottom:1px solid #8297aa;
+  border-radius:0;
+  background-color:#111c28;
+}
+:is(input:not([type=checkbox]):not([type=radio]), select):focus-visible {
+  outline:2px solid #9edaff;
+  outline-offset:2px;
+}
+
+</style>
 </head><body><header><h1>MD-11 GE • EVM FAN BALANCE</h1><p>Pages 51–64 only · 38-hole spinner · reference and inventory worksheet</p></header><main>
 <p class="amt-note">AMT IS RESPONSIBLE FOR VERIFYING AMM DATA IS CURRENT.</p>
 <nav class="tabs"><button data-tab="balance" class="on">Calculate</button><button data-tab="inventory">38 Holes</button><button data-tab="manual">Source Pages</button></nav>
