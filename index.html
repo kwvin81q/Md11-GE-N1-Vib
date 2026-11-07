@@ -118,7 +118,18 @@ function renderHoles(){ $('holes').innerHTML=installed.map((p,i)=>`<button type=
 function calculate(){if(!screwConfirmation){$('result').textContent='Confirm the installed screw configuration first: check ALL P07/P14 or use UPDATE WEIGHTS.';return;}const v=Number($('mils').value),ph=Number($('phase').value),speed=Number($('n1').value);if(!$('mils').value||!$('phase').value||!Number.isFinite(v)||v<2||v>10||!Number.isFinite(ph)||ph<0||ph>360){$('result').innerHTML='Enter vibration from 2.0–10.0 mils and phase from 0–360°. Values outside the photographed chart cannot be calculated.';last=null;$('autoOut').textContent='No valid estimate is available for a centered comparison.';return}
  // The last table row is 355.1–365 degrees: 0–5 degrees wrap into this same row.
  const lookupPhase=ph<=5?ph+360:ph;
- const bin=phaseRanges.findIndex(([a,b])=>lookupPhase>=a-1e-6&&lookupPhase<=b+1e-6);const hole=holeAt(speed,bin);let grams;if(speed===100){let r=(v-2)/.2,l=Math.max(0,Math.min(40,Math.floor(r))),h=Math.min(40,Math.max(0,Math.ceil(r)));grams=weight100[l]+(weight100[h]-weight100[l])*(r-l); }else{let t=endpoints[speed];grams=t[0]+(t[1]-t[0])*(v-2)/8}
+ const bin=phaseRanges.findIndex(([a,b])=>lookupPhase>=a-1e-6&&lookupPhase<=b+1e-6);// These printed cells disagree with the surrounding hole progression.
+ const disputedCell=(speed===96&&bin===20)||(speed===98&&bin===2);
+ if(disputedCell){
+   last=null;
+   $('verifiedWeight').value='';
+   $('verifiedHole').value='';
+   $('result').textContent='Automatic estimate withheld. Confirm this phase and speed cell in the current controlled AMM.';
+   $('autoOut').textContent='Automatic screw comparison withheld.';
+   $('draftOut').textContent='Enter the independently confirmed AMM weight and hole for manual comparison.';
+   return;
+ }
+ const hole=holeAt(speed,bin);let grams;if(speed===100){let r=(v-2)/.2,l=Math.max(0,Math.min(40,Math.floor(r))),h=Math.min(40,Math.max(0,Math.ceil(r)));grams=weight100[l]+(weight100[h]-weight100[l])*(r-l); }else{let t=endpoints[speed];grams=t[0]+(t[1]-t[0])*(v-2)/8}
  last={grams,hole,speed,v,ph};$('result').innerHTML=`<span class="badge">REFERENCE ONLY · VALIDATE AGAINST AMM</span><h2 style="margin-top:12px">${speed}% N1 · ${rpm[speed-88].toLocaleString()} RPM</h2><div class="big">≈ ${grams.toFixed(1)} g</div><p>Corrective effective-weight magnitude ${speed===100?'from the manually transcribed 100% column':'estimated using chart endpoints; not the exact intermediate manual cell'}.</p><h3>${hole===null?'Phase bin not mapped':`Preliminary location: hole ${hole}`}</h3><p>Entered ${v.toFixed(2)} mils, ${ph.toFixed(1)}°. ${hole===null?'Check the displayed phase scale and Fig. 525/526.':`Installed reference screw at that hole: <b>${P[installed[hole-1]]}</b>. Hole progression must be checked against Figure ${speed<=97?'525':'526'} at this N1.`}</p><p class="muted"><b>For exact AMM-based verification:</b> confirm the exact effective grams and hole from the current controlled AMM, then use Step 2 below.</p>`;
  $('verifiedWeight').value='';$('verifiedHole').value='';$('draftOut').textContent='Enter exact confirmed AMM values here to compare with the automatic example above.';draft('auto');}
 // Enumerate a small set of centered neighboring-hole changes, for comparison only.
